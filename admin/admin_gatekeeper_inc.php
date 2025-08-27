@@ -11,15 +11,15 @@ if (isset($_REQUEST["gatekeeperset"]) && isset($_REQUEST["homeSample"])) {
 require_once( GATEKEEPER_PKG_CLASS_PATH.'LibertyGatekeeper.php' );
 
 
-$gGatekeeper = new LibertyGatekeeper( !empty( $_REQUEST['gatekeeper_id'] ) ? $_REQUEST['gatekeeper_id'] : NULL );
+$gGatekeeper = new LibertyGatekeeper( !empty( $_REQUEST['gatekeeper_id'] ) ? $_REQUEST['gatekeeper_id'] : null );
 
 if( !empty( $_REQUEST['savegatekeeper'] ) ) {
 	if( $gGatekeeper->store( $_REQUEST ) ) {
 		header( 'Location: '.KERNEL_PKG_URL.'admin/index.php?page=gatekeeper' );
 		die;
 	} else {
-		$saveError = TRUE;
-		$gBitSmarty->assignByRef( 'gatekeeperErrors', $gGatekeeper->mErrors );
+		$saveError = true;
+		$gBitSmarty->assign( 'gatekeeperErrors', $gGatekeeper->mErrors );
 	}
 } elseif( !empty( $_REQUEST['assigngatekeeper'] ) ) {
 	foreach( array_keys( $_REQUEST ) as $key ) {
@@ -32,16 +32,16 @@ if( !empty( $_REQUEST['savegatekeeper'] ) ) {
 }
 // $gGatekeeper->load();
 if( $gGatekeeper->isValid() || isset( $_REQUEST['newgatekeeper'] ) || !empty( $saveError ) ) {
-	$gBitSmarty->assignByRef('gGatekeeper', $gGatekeeper);
+	$gBitSmarty->assign('gGatekeeper', $gGatekeeper);
 } else {
 	$gatekeepers = $gGatekeeper->getList();
 	$systemGroups = $gGatekeeper->getGatekeeperGroups();
-	$gBitSmarty->assignByRef('systemGroups', $systemGroups );
+	$gBitSmarty->assign('systemGroups', $systemGroups );
 foreach( array_keys( $systemGroups ) as $groupId ) {
 	$groupGatekeeper[$groupId] = $gGatekeeper->getGatekeeperMenu( 'gatekeeper_group_'.$groupId, $systemGroups[$groupId]['gatekeeper_id'] );
 }
-	$gBitSmarty->assignByRef('groupGatekeeper', $groupGatekeeper );
-	$gBitSmarty->assignByRef('gatekeeperList', $gatekeepers);
+	$gBitSmarty->assign('groupGatekeeper', $groupGatekeeper );
+	$gBitSmarty->assign('gatekeeperList', $gatekeepers);
 }
 
 ?>

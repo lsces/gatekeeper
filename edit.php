@@ -23,7 +23,7 @@
 /**
  * required setup
  */
-require_once( '../kernel/includes/setup_inc.php' );
+require_once '../kernel/includes/setup_inc.php';
 
 $gBitSystem->verifyPackage( 'gatekeeper' );
 $gBitSystem->verifyPermission( 'p_gatekeeper_create' );
@@ -48,9 +48,9 @@ elseif( !empty( $sec ) ||
 		if( $gGatekeeper->storeSecurity( $_REQUEST ) ) {
 			header( 'Location: '.GATEKEEPER_PKG_URL );
 		} else {
-			$gBitSmarty->assignByRef( 'errors', $gGatekeeper->mErrors );
+			$gBitSmarty->assign( 'errors', $gGatekeeper->mErrors );
 			$_REQUEST['selected'] = $_REQUEST['access_level'];
-			$gBitSmarty->assignByRef( 'security', $_REQUEST );
+			$gBitSmarty->assign( 'security', $_REQUEST );
 		}
 	} elseif( !empty( $_REQUEST['deletesecurity'] ) ) {
 		if( empty( $_REQUEST['confirm'] ) ) {
@@ -77,7 +77,7 @@ elseif( !empty( $sec ) ||
 		}
 	}
 
-	$gBitSmarty->assignByRef( 'security', $sec );
+	$gBitSmarty->assign( 'security', $sec );
 	$gBitSystem->display( 'bitpackage:gatekeeper/edit_security.tpl', 'Edit Security' , array( 'display_mode' => 'edit' ));
 } else {
 	header( 'Location: '.GATEKEEPER_PKG_URL );

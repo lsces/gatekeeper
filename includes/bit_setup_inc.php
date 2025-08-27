@@ -1,12 +1,13 @@
 <?php
+namespace Bitweaver;
 global $gBitSystem, $gBitSmarty, $gLibertySystem;
 
-$registerHash = array(
+$pRegisterHash = array(
 	'package_name' => 'gatekeeper',
 	'package_path' => dirname( dirname( __FILE__ ) ).'/',
 	'service' => LIBERTY_SERVICE_ACCESS_CONTROL
 );
-$gBitSystem->registerPackage( $registerHash );
+$gBitSystem->registerPackage( $pRegisterHash );
 
 require_once( GATEKEEPER_PKG_CLASS_PATH.'LibertyGatekeeper.php' );
 

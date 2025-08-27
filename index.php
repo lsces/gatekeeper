@@ -13,7 +13,7 @@
 //
 // $Id$
 
-require_once( '../kernel/includes/setup_inc.php' );
+require_once '../kernel/includes/setup_inc.php';
 
 $gBitSystem->verifyPackage( 'gatekeeper' );
 $gBitSystem->verifyPermission( 'p_gatekeeper_create' );
@@ -21,7 +21,7 @@ $gBitSystem->verifyPermission( 'p_gatekeeper_create' );
 require_once( GATEKEEPER_PKG_CLASS_PATH.'LibertyGatekeeper.php' );
 
 $lists = $gGatekeeper->getSecurityList();
-$gBitSmarty->assignByRef( 'securities', $lists );
+$gBitSmarty->assign( 'securities', $lists );
 
 $gBitSystem->display( 'bitpackage:gatekeeper/list_security.tpl', 'Security Lists' , array( 'display_mode' => 'display' ));
 
