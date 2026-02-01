@@ -2,14 +2,14 @@
 namespace Bitweaver;
 global $gBitSystem, $gBitSmarty, $gLibertySystem;
 
-$pRegisterHash = array(
+$pRegisterHash = [
 	'package_name' => 'gatekeeper',
-	'package_path' => dirname( dirname( __FILE__ ) ).'/',
-	'service' => LIBERTY_SERVICE_ACCESS_CONTROL
-);
+	'package_path' => dirname( dirname( __FILE__ ) ) . '/',
+	'service'      => LIBERTY_SERVICE_ACCESS_CONTROL,
+];
 $gBitSystem->registerPackage( $pRegisterHash );
 
-require_once( GATEKEEPER_PKG_CLASS_PATH.'LibertyGatekeeper.php' );
+require_once GATEKEEPER_PKG_CLASS_PATH . 'LibertyGatekeeper.php';
 
 if( $gBitSystem->isPackageActive( 'gatekeeper' ) ) {
 	$gLibertySystem->registerService( LIBERTY_SERVICE_ACCESS_CONTROL, GATEKEEPER_PKG_NAME, array(
@@ -24,4 +24,3 @@ if( $gBitSystem->isPackageActive( 'gatekeeper' ) ) {
 		'content_icon_tpl' => 'bitpackage:gatekeeper/gatekeeper_service_icon.tpl',
 	) );
 }
-?>
