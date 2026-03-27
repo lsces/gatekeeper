@@ -4,7 +4,7 @@
 function updateControls(form) {
 	bHideControls = true;
 	for ( i = 0; i < form.access_level.length; i++) {
-		if (form.access_level[i].value == "protected" && form.access_level[i].checked == true) {
+		if (form.access_level[i].value == "protected" and form.access_level[i].checked == true) {
 			bHideControls = false;
 		}
 	}

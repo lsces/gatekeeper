@@ -1,4 +1,4 @@
-{if !$serviceHash && $gContent->mInfo}
+{if !$serviceHash and $gContent->mInfo}
 	{assign var=serviceHash value=$gContent->mInfo}
 {/if}
 

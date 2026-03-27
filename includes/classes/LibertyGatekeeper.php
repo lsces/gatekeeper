@@ -15,7 +15,10 @@
 /**
  * required setup
  */
+use Bitweaver\KernelTools;
+use Bitweaver\BitBase;
 use Bitweaver\Liberty\LibertyBase;
+use Bitweaver\HttpStatusCodes;
 
 /**
  * Gatekeeper class to illustrate best practices when creating a new bitweaver package that
@@ -58,7 +61,7 @@ class LibertyGatekeeper extends LibertyBase {
 				$pParamHash['security_store']['is_private'] = ($pParamHash['access_level'] == 'private' ? 'y' : NULL);
 				// If we have an answer, store the question.
 				if( $pParamHash['access_level'] == 'protected' && empty( $pParamHash['access_answer'] ) ) {
-					$this->mErrors['security'] = tra( "You must enter an answer for your security question." );
+					$this->mErrors['security'] = KernelTools::tra( "You must enter an answer for your security question." );
 				} else {
 					$pParamHash['security_store']['access_question'] = !empty( $pParamHash['access_answer'] ) ? $pParamHash['access_question'] : NULL;
 					$pParamHash['security_store']['access_answer'] = !empty( $pParamHash['access_answer'] ) ? trim( $pParamHash['access_answer'] ) : NULL;
@@ -78,7 +81,7 @@ class LibertyGatekeeper extends LibertyBase {
 		}
 		if( !empty( $pParamHash['access_level'] ) || ( @$this->verifyId( $pParamHash['security_id'] ) && $pParamHash['security_id'] != 'public') ) {
 			if( $this->verifySecurity( $pParamHash ) && !empty( $pParamHash['security_store'] ) ) {
-				trim_array( $pParamHash );
+				KernelTools::trim_array( $pParamHash );
 				if( !empty( $pParamHash['security_store'] ) ) {
 					global $gBitUser;
 					$table = BIT_DB_PREFIX."gatekeeper_security";
@@ -219,16 +222,11 @@ function gatekeeper_content_verify_access( &$pContent, &$pHash ) {
 								}
 							}
 							if( $node['is_private'] ) {
-								if( !empty( $pHash['no_fatal'] ) ) {
-									// We are on a listing, so we should hide this with an empty error message
-									$errorMessage = '';
-								} else {
-									$errorMessage = tra( 'You cannot view this' ).' '.strtolower( $gLibertySystem->getContentTypeName( $pHash['content_type_guid'] ) );
-								}
+								$errorMessage = ( !empty( $pHash['no_fatal'] ) ) ? '' : KernelTools::tra( 'You cannot view this' ) . ' ' . strtolower( $gLibertySystem->getContentTypeName( $pHash['content_type_guid'] ) );
 							}
-							if( !empty( $node['access_answer'] ) ) {
+							if (!empty( $node['access_answer'] )) {
 								$pContent->mInfo = array_merge( $pHash, $node );
-								if( $valError = gatekeeper_authenticate( $node, empty( $pHash['no_fatal'] ) ) ) {
+								if ($valError = gatekeeper_authenticate( $node, empty( $pHash['no_fatal'] ) )) {
 									$errorMessage = $valError;
 								}
 							}
@@ -236,51 +234,51 @@ function gatekeeper_content_verify_access( &$pContent, &$pHash ) {
 						$lastLevel = $node['level'];
 					}
 
-					if( isset( $errorMessage ) ) {
-						if( empty( $pHash['no_fatal'] ) ) {
-							$gBitSystem->fatalError( tra( $errorMessage ), NULL, NULL, HttpStatusCodes::HTTP_NOT_FOUND );
-						} else {
+					if (isset( $errorMessage )) {
+						if (empty( $pHash['no_fatal'] )) {
+							$gBitSystem->fatalError( KernelTools::tra( $errorMessage ), null, null, HttpStatusCodes::HTTP_NOT_FOUND );
+						}
+						else {
 							$error['access_control'] = $errorMessage;
 						}
 					}
 
-				} elseif( !empty( $gBitDb->mDb->_errorMsg ) ) {
-					if( $gBitUser->isOwner() ) {
-						$gBitSmarty->assign( 'feedback', array( 'warning' => $gBitDb->mDb->_errorMsg.'<br/>'.tra( 'Please check the galleries to which this '.$gLibertySystem->getContentTypeName( $pHash['content_type_guid'] ).' belongs' ) ) );
+				}
+				elseif (!empty( $gBitDb->mDb->_errorMsg )) {
+					if ($gBitUser->isOwner()) {
+						$gBitSmarty->assign( 'feedback', array( 'warning' => $gBitDb->mDb->_errorMsg . '<br/>' . KernelTools::tra( 'Please check the galleries to which this ' . $gLibertySystem->getContentTypeName( $pHash['content_type_guid'] ) . ' belongs' ) ) );
 					}
 				}
-			} elseif( !empty( $pHash['security_id'] ) ) {
+			}
+			elseif (!empty( $pHash['security_id'] )) {
 				// order matters here!
-				if( $pHash['is_hidden'] == 'y' ) {
-					$ret = TRUE;
+				if ($pHash['is_hidden'] == 'y') {
+					$ret = true;
 				}
-				if( $pHash['is_private'] == 'y' ) {
-					$errorMessage = tra( 'You cannot view this' ).' '.strtolower( $gLibertySystem->getContentTypeName( $pHash['content_type_guid'] ) );
-					if( empty( $pHash['no_fatal'] ) ) {
-						$gBitSystem->fatalError( tra( $errorMessage ), NULL, NULL, HttpStatusCodes::HTTP_NOT_FOUND );
-					} else {
+				if ($pHash['is_private'] == 'y') {
+					$errorMessage = KernelTools::tra( 'You cannot view this' ) . ' ' . strtolower( $gLibertySystem->getContentTypeName( $pHash['content_type_guid'] ) );
+					if (empty( $pHash['no_fatal'] )) {
+						$gBitSystem->fatalError( KernelTools::tra( $errorMessage ), null, null, HttpStatusCodes::HTTP_NOT_FOUND );
+					}
+					else {
 						$error['access_control'] = $errorMessage;
 					}
 				}
-				if( !empty( $pHash['access_answer'] ) ) {
-					if( !($valError = gatekeeper_authenticate( $pHash, empty( $pHash['no_fatal'] ) ) ) ) {
+				if (!empty( $pHash['access_answer'] )) {
+					if (!( $valError = gatekeeper_authenticate( $pHash, empty( $pHash['no_fatal'] ) ) )) {
 						$error['access_control'] = $valError;
 					}
 				}
 			}
 
-			if( !empty( $pHash['user_id'] ) && !$gBitUser->hasPermission( 'p_users_admin' ) && $gBitUser->isUserPrivate( $pHash['user_id'] ) && empty( $pHash['security_id'] ) ) {
+			if (!empty( $pHash['user_id'] ) && !$gBitUser->hasPermission( 'p_users_admin' ) && $gBitUser->isUserPrivate( $pHash['user_id'] ) && empty( $pHash['security_id'] )) {
 				// Final privacy check if there is no security check...
-				if( !empty( $pHash['no_fatal'] ) ) {
-					// We are on a listing, so we should hide this with an empty error message
-					$errorMessage = '';
-				} else {
-					$errorMessage = tra( 'You cannot view this' ).' '.strtolower( $gLibertySystem->getContentTypeName( $pHash['content_type_guid'] ) );
-				}
+				$errorMessage = ( !empty( $pHash['no_fatal'] ) ) ? '' : KernelTools::tra( 'You cannot view this' ) . ' ' . strtolower( $gLibertySystem->getContentTypeName( $pHash['content_type_guid'] ) );
 
-				if( empty( $pHash['no_fatal'] ) ) {
-					$gBitSystem->fatalError( tra( $errorMessage ), NULL, NULL, HttpStatusCodes::HTTP_NOT_FOUND );
-				} else {
+				if (empty( $pHash['no_fatal'] )) {
+					$gBitSystem->fatalError( KernelTools::tra( $errorMessage ), null, null, HttpStatusCodes::HTTP_NOT_FOUND );
+				}
+				else {
 					$error['access_control'] = $errorMessage;
 				}
 			}
@@ -303,7 +301,7 @@ function gatekeeper_authenticate( &$pInfo, $pFatalOnError = TRUE ) {
 				$gBitSystem->display("bitpackage:gatekeeper/authenticate.tpl", "Password Required" , array( 'display_mode' => 'display' ));
 				die;
 			} else {
-				$ret = '<h2>'.tra( "Password Required" ).'</h2>'.$gBitSmarty->fetch( "bitpackage:gatekeeper/authenticate.tpl" );
+				$ret = '<h2>'.KernelTools::tra( "Password Required" ).'</h2>'.$gBitSmarty->fetch( "bitpackage:gatekeeper/authenticate.tpl" );
 			}
 		}
 	}
@@ -326,26 +324,26 @@ function gatekeeper_content_list( $pObject, $pParamHash ) {
 	global $gBitSystem, $gGatekeeper, $gBitUser;
 
 
-	$ret = array();
+	$ret = [];
 
 	if( !is_a( $pObject, 'LibertyComment' ) ) {
-		if( is_a( $pObject, 'FisheyeImage' ) && $pObject->isValid() ) {
+		if( is_a( $pObject, '\Bitweaver\Fisheye\FisheyeImage' ) && $pObject->isValid() ) {
 			if( $gBitSystem->mDb->isAdvancedPostgresEnabled() ) {
 				$ret['where_sql'] = " AND (SELECT gks.`security_id` FROM connectby('fisheye_gallery_image_map', 'gallery_content_id', 'item_content_id', fi.`content_id`, 0, '/')  AS t(`cb_gallery_content_id` int, `cb_item_content_id` int, level int, branch text), `".BIT_DB_PREFIX."gatekeeper_security_map` cgm,  `".BIT_DB_PREFIX."gatekeeper_security` gks
 						  WHERE gks.`security_id`=cgm.`security_id` AND cgm.`content_id`=`cb_gallery_content_id` LIMIT 1) IS NULL";
 			} else {
-				$ret = array(
-				'select_sql' => ' ,gks.`security_id`, gks.`security_description`, gks.`is_private`, gks.`is_hidden`, gks.`access_question`, gks.`access_answer` ',
-				'join_sql' => " LEFT OUTER JOIN `".BIT_DB_PREFIX."gatekeeper_security_map` cg ON (lc.`content_id`=cg.`content_id`) LEFT OUTER JOIN `".BIT_DB_PREFIX."gatekeeper_security` gks ON (gks.`security_id`=cg.`security_id` )  LEFT OUTER JOIN `".BIT_DB_PREFIX."fisheye_gallery_image_map` fgim ON (fgim.`item_content_id`=lc.`content_id`) LEFT OUTER JOIN `".BIT_DB_PREFIX."gatekeeper_security_map` tcs2 ON (fgim.`gallery_content_id`=tcs2.`content_id`) LEFT OUTER JOIN `".BIT_DB_PREFIX."gatekeeper_security` ts2 ON (ts2.`security_id`=tcs2.`security_id` )",
-				'where_sql' => ' AND (tcs2.`security_id` IS NULL OR lc.`user_id`=?) ',
-				'bind_vars' => array( $gBitUser->mUserId ),
-				);
+				$ret = [
+					'select_sql' => ' ,gks.`security_id`, gks.`security_description`, gks.`is_private`, gks.`is_hidden`, gks.`access_question`, gks.`access_answer` ',
+					'join_sql'   => " LEFT OUTER JOIN `" . BIT_DB_PREFIX . "gatekeeper_security_map` cg ON (lc.`content_id`=cg.`content_id`) LEFT OUTER JOIN `" . BIT_DB_PREFIX . "gatekeeper_security` gks ON (gks.`security_id`=cg.`security_id` )  LEFT OUTER JOIN `" . BIT_DB_PREFIX . "fisheye_gallery_image_map` fgim ON (fgim.`item_content_id`=lc.`content_id`) LEFT OUTER JOIN `" . BIT_DB_PREFIX . "gatekeeper_security_map` tcs2 ON (fgim.`gallery_content_id`=tcs2.`content_id`) LEFT OUTER JOIN `" . BIT_DB_PREFIX . "gatekeeper_security` ts2 ON (ts2.`security_id`=tcs2.`security_id` )",
+					'where_sql'  => ' AND (tcs2.`security_id` IS NULL OR lc.`user_id`=?) ',
+					'bind_vars'  => array( $gBitUser->mUserId ),
+				];
 			}
 		} else {
-			$ret = array(
+			$ret = [
 				'select_sql' => ' ,gks.`security_id`, gks.`security_description`, gks.`is_private`, gks.`is_hidden`, gks.`access_question`, gks.`access_answer` ',
-				'join_sql' => " LEFT OUTER JOIN `".BIT_DB_PREFIX."gatekeeper_security_map` cg ON (lc.`content_id`=cg.`content_id`) LEFT OUTER JOIN `".BIT_DB_PREFIX."gatekeeper_security` gks ON (gks.`security_id`=cg.`security_id` )",
-			);
+				'join_sql'   => " LEFT OUTER JOIN `" . BIT_DB_PREFIX . "gatekeeper_security_map` cg ON (lc.`content_id`=cg.`content_id`) LEFT OUTER JOIN `" . BIT_DB_PREFIX . "gatekeeper_security` gks ON (gks.`security_id`=cg.`security_id` )",
+			];
 			if( !is_object( $pObject ) || !method_exists($pObject,"hasAdminPermission") || !$pObject->hasAdminPermission( FALSE ) ) {
 				$ret['where_sql'] = ' AND (cg.`security_id` IS NULL OR lc.`user_id`=?) ';
 				$ret['bind_vars'][] = $gBitUser->mUserId;

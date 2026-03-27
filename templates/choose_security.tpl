@@ -21,7 +21,7 @@ function toggleSecuirtyEdit(form) {
 		<select class="form-control" name="security_id" id="securityselect" onchange="toggleSecuirtyEdit(this)">
 			<option value="public">{tr}Access based on User Information setting{/tr} ({tr}Currently{/tr} {if $gBitUser->isUserPrivate($gContent->getField('user_id'))}{tr}Private{/tr}{else}{tr}Public{/tr}{/if})</option>
 				{foreach from=$securities key=secId item=sec}
-					<option value="{$secId}" {if $secId==$smarty.request.security_id || ($secId==$serviceHash.security_id && !$secId==$smarty.request.security_id) }selected="selected"{/if}>{$sec.security_description}</option>
+					<option value="{$secId}" {if $secId==$smarty.request.security_id or ($secId==$serviceHash.security_id and !$secId==$smarty.request.security_id) }selected="selected"{/if}>{$sec.security_description}</option>
 				{/foreach}
 			<option value="new">{tr}Create New Security Level{/tr}...</option>
 		</select>
