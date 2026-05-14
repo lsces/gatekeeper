@@ -29,42 +29,42 @@ foreach( array_keys( $tables ) AS $tableName ) {
 	$gBitInstaller->registerSchemaTable( GATEKEEPER_PKG_NAME, $tableName, $tables[$tableName] );
 }
 
-$gBitInstaller->registerPackageInfo( GATEKEEPER_PKG_NAME, array(
+$gBitInstaller->registerPackageInfo( GATEKEEPER_PKG_NAME, [
 	'description' => "Gatekeeper system allows the creation of protected content. This content can then only be accessed by using a specified url, password or only the creator.",
 	'license' => '<a href="http://www.gnu.org/licenses/licenses.html#LGPL">LGPL</a>',
-) );
+] );
 
 // ### Indexes
 $indices = [
-	'gatekeeper_security_user_idx'   => array( 'table' => 'gatekeeper_security', 'cols' => 'user_id', 'opts' => null ),
-	'gatekeeper_consec_security_idx' => array( 'table' => 'gatekeeper_security_map', 'cols' => 'security_id', 'opts' => null ),
-	'gatekeeper_consec_content_idx'  => array( 'table' => 'gatekeeper_security_map', 'cols' => 'content_id', 'opts' => array( 'UNIQUE' ) ),
+	'gatekeeper_security_user_idx'   => [ 'table' => 'gatekeeper_security', 'cols' => 'user_id', 'opts' => null ],
+	'gatekeeper_consec_security_idx' => [ 'table' => 'gatekeeper_security_map', 'cols' => 'security_id', 'opts' => null ],
+	'gatekeeper_consec_content_idx'  => [ 'table' => 'gatekeeper_security_map', 'cols' => 'content_id', 'opts' => [ 'UNIQUE' ] ],
 ];
 $gBitInstaller->registerSchemaIndexes( GATEKEEPER_PKG_NAME, $indices );
 
 // ### Sequences
 $sequences = [
-	'gatekeeper_security_id_seq' => array( 'start' => 1 ),
+	'gatekeeper_security_id_seq' => [ 'start' => 1 ],
 ];
 $gBitInstaller->registerSchemaSequences( GATEKEEPER_PKG_NAME, $sequences );
 
 // ### Default UserPermissions
-$gBitInstaller->registerUserPermissions( GATEKEEPER_PKG_NAME, array(
+$gBitInstaller->registerUserPermissions( GATEKEEPER_PKG_NAME, [
 	[ 'p_gatekeeper_create', 'Can create a gatekeeper', 'registered', GATEKEEPER_PKG_NAME ],
 	[ 'p_gatekeeper_edit', 'Can edit any gatekeeper', 'editors', GATEKEEPER_PKG_NAME ],
 	[ 'p_gatekeeper_admin', 'Can admin gatekeeper', 'editors', GATEKEEPER_PKG_NAME ],
 	[ 'p_gatekeeper_read', 'Can read gatekeeper', 'basic', GATEKEEPER_PKG_NAME ],
-) );
+] );
 
 // ### Default Preferences
-$gBitInstaller->registerPreferences( GATEKEEPER_PKG_NAME, array(
+$gBitInstaller->registerPreferences( GATEKEEPER_PKG_NAME, [
 	[ GATEKEEPER_PKG_NAME, 'gatekeeper_default_ordering', 'title_desc' ],
 	[ GATEKEEPER_PKG_NAME, 'gatekeeper_list_content_id', 'y' ],
 	[ GATEKEEPER_PKG_NAME, 'gatekeeper_list_title', 'y' ],
 	[ GATEKEEPER_PKG_NAME, 'gatekeeper_list_description', 'y' ],
-) );
+] );
 
 // Requirements
-$gBitInstaller->registerRequirements( GATEKEEPER_PKG_NAME, array(
+$gBitInstaller->registerRequirements( GATEKEEPER_PKG_NAME, [
 	'liberty' => [ 'min' => '5.0.0' ],
-));
+]);

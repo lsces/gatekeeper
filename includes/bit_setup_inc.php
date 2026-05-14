@@ -1,5 +1,6 @@
 <?php
 namespace Bitweaver;
+
 global $gBitSystem, $gBitSmarty, $gLibertySystem;
 
 $pRegisterHash = [
@@ -12,7 +13,7 @@ $gBitSystem->registerPackage( $pRegisterHash );
 require_once GATEKEEPER_PKG_CLASS_PATH . 'LibertyGatekeeper.php';
 
 if( $gBitSystem->isPackageActive( 'gatekeeper' ) ) {
-	$gLibertySystem->registerService( LIBERTY_SERVICE_ACCESS_CONTROL, GATEKEEPER_PKG_NAME, array(
+	$gLibertySystem->registerService( LIBERTY_SERVICE_ACCESS_CONTROL, GATEKEEPER_PKG_NAME, [
 		'content_display_function' => 'gatekeeper_content_display',
 		'content_edit_function' => 'gatekeeper_content_edit',
 		'content_store_function' => 'gatekeeper_content_store',
@@ -22,5 +23,5 @@ if( $gBitSystem->isPackageActive( 'gatekeeper' ) ) {
 		'content_verify_access' => 'gatekeeper_content_verify_access',
 		'content_edit_mini_tpl' => 'bitpackage:gatekeeper/choose_security.tpl',
 		'content_icon_tpl' => 'bitpackage:gatekeeper/gatekeeper_service_icon.tpl',
-	) );
+	] );
 }

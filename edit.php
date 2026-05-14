@@ -40,8 +40,8 @@ if( !empty( $_REQUEST['cancelsecurity'] ) ) {
 	die;
 }
 elseif( !empty( $sec ) ||
-        !empty( $_REQUEST['savesecurity'] ) ||
-        !empty( $_REQUEST['newsecurity'] ) ) {
+		!empty( $_REQUEST['savesecurity'] ) ||
+		!empty( $_REQUEST['newsecurity'] ) ) {
 	// we can not get in here unless we own the $security
 
 	if( !empty( $_REQUEST['savesecurity'] ) ) {
@@ -56,10 +56,10 @@ elseif( !empty( $sec ) ||
 		if( empty( $_REQUEST['confirm'] ) ) {
 			$formHash['deletesecurity'] = $_REQUEST['deletesecurity'];
 			$formHash['security_id'] = $_REQUEST['security_id'];
-			$gBitSystem->confirmDialog( $formHash, 
-				array( 
-					'warning' => tra('Are you sure you want to delete this security list?') . ' ' . $sec['security_description']
-				)
+			$gBitSystem->confirmDialog( $formHash,
+				[
+					'warning' => tra('Are you sure you want to delete this security list?') . ' ' . $sec['security_description'],
+				],
 			);
 		} elseif( $gGatekeeper->expungeSecurity( $sec['security_id'] ) ) {
 			header( 'Location: '.GATEKEEPER_PKG_URL );
@@ -78,7 +78,7 @@ elseif( !empty( $sec ) ||
 	}
 
 	$gBitSmarty->assign( 'security', $sec );
-	$gBitSystem->display( 'bitpackage:gatekeeper/edit_security.tpl', 'Edit Security' , array( 'display_mode' => 'edit' ));
+	$gBitSystem->display( 'bitpackage:gatekeeper/edit_security.tpl', 'Edit Security' , [ 'display_mode' => 'edit' ]);
 } else {
 	header( 'Location: '.GATEKEEPER_PKG_URL );
 	die;

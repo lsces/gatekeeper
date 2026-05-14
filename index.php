@@ -23,6 +23,6 @@ require_once( GATEKEEPER_PKG_CLASS_PATH.'LibertyGatekeeper.php' );
 $lists = $gGatekeeper->getSecurityList();
 $gBitSmarty->assign( 'securities', $lists );
 
-$gBitSystem->display( 'bitpackage:gatekeeper/list_security.tpl', 'Security Lists' , array( 'display_mode' => 'display' ));
+$gBitSystem->display( 'bitpackage:gatekeeper/list_security.tpl', 'Security Lists' , [ 'display_mode' => 'display' ]);
 
 ?>

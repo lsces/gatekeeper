@@ -33,8 +33,8 @@ use Bitweaver\HttpStatusCodes;
  * @version $Revision$
  */
 class LibertyGatekeeper extends LibertyBase {
-    /**
-    * During initialisation, be sure to call our base constructors
+	/**
+	* During initialisation, be sure to call our base constructors
 	**/
 	function __construct( $pContentId=NULL ) {
 		$this->mContentId = $pContentId;
@@ -77,7 +77,7 @@ class LibertyGatekeeper extends LibertyBase {
 			// We'll first nuke any security mappings for this content_id
 			$sql = "DELETE FROM `".BIT_DB_PREFIX."gatekeeper_security_map`
 					WHERE `content_id` = ?";
-			$rs = $this->mDb->query( $sql, array( $pParamHash['content_id'] ) );
+			$rs = $this->mDb->query( $sql, [ $pParamHash['content_id'] ] );
 		}
 		if( !empty( $pParamHash['access_level'] ) || ( @$this->verifyId( $pParamHash['security_id'] ) && $pParamHash['security_id'] != 'public') ) {
 			if( $this->verifySecurity( $pParamHash ) && !empty( $pParamHash['security_store'] ) ) {
@@ -91,14 +91,14 @@ class LibertyGatekeeper extends LibertyBase {
 						$pParamHash['security_store']['security_id'] = $pParamHash['security_id'];
 						$result = $this->mDb->associateInsert( $table, $pParamHash['security_store'] );
 					} else {
-						$result = $this->mDb->associateUpdate( $table, $pParamHash['security_store'], array( "security_id" => $pParamHash['security_id']) );
+						$result = $this->mDb->associateUpdate( $table, $pParamHash['security_store'], [ "security_id" => $pParamHash['security_id']] );
 					}
 				}
 			}
 
 			if( @$this->verifyId( $pParamHash['content_id'] ) && @$this->verifyId( $pParamHash['security_id'] ) ) {
 				$sql = "INSERT INTO `".BIT_DB_PREFIX."gatekeeper_security_map` ( `content_id`, `security_id` ) VALUES (?,?)";
-				$rs = $this->mDb->query( $sql, array( $pParamHash['content_id'], $pParamHash['security_id'] ) );
+				$rs = $this->mDb->query( $sql, [ $pParamHash['content_id'], $pParamHash['security_id'] ] );
 			}
 		}
 		return( count( $this->mErrors ) == 0 );
@@ -110,7 +110,7 @@ class LibertyGatekeeper extends LibertyBase {
 			$pUserId = $gBitUser->mUserId;
 		}
 		$whereSql = NULL;
-		$bindVars = array( $pUserId );
+		$bindVars = [ $pUserId ];
 		if( @$this->verifyId( $pSecurityId ) ) {
 			$whereSql = ' AND `security_id`=? ';
 			array_push( $bindVars, $pSecurityId );
@@ -132,10 +132,10 @@ class LibertyGatekeeper extends LibertyBase {
 			$this->StartTrans();
 
 			$sql = "DELETE FROM `".BIT_DB_PREFIX."gatekeeper_security_map` WHERE security_id=?";
-			$rs = $this->mDb->query( $sql, array( $pSecurityId ) );
+			$rs = $this->mDb->query( $sql, [ $pSecurityId ] );
 
 			$sql = "DELETE FROM `".BIT_DB_PREFIX."gatekeeper_security` WHERE security_id=?";
-			$rs = $this->mDb->query( $sql, array( $pSecurityId ) );
+			$rs = $this->mDb->query( $sql, [ $pSecurityId ] );
 
 			$this->CompleteTrans();
 			$ret = TRUE;
@@ -145,10 +145,10 @@ class LibertyGatekeeper extends LibertyBase {
 }
 
 function gatekeeper_content_load() {
-	$ret = array(
+	$ret = [
 		'select_sql' => ' ,gs.`security_id` AS `has_access_control`, gs.`security_id`, gs.`security_description`, gs.`is_private`, gs.`is_hidden`, gs.`access_question`, gs.`access_answer`  ',
 		'join_sql' => " LEFT OUTER JOIN `".BIT_DB_PREFIX."gatekeeper_security_map` gsm ON ( lc.`content_id`=gsm.`content_id` )  LEFT OUTER JOIN `".BIT_DB_PREFIX."gatekeeper_security` gs ON ( gsm.`security_id`=gs.`security_id` ) ",
-	);
+	];
 	return $ret;
 }
 
@@ -167,7 +167,7 @@ function gatekeeper_content_store( &$pObject, &$pParamHash ) {
 function gatekeeper_content_expunge( &$pObject ) {
 	if( $pObject->getField('content_id') ) {
 		// We'll first nuke any security mappings for this content_id
-		$pObject->mDb->query( "DELETE FROM `".BIT_DB_PREFIX."gatekeeper_security_map` WHERE `content_id` = ?", array( $pObject->getField('content_id') ) );
+		$pObject->mDb->query( "DELETE FROM `".BIT_DB_PREFIX."gatekeeper_security_map` WHERE `content_id` = ?", [ $pObject->getField('content_id') ] );
 	}
 }
 
@@ -202,7 +202,7 @@ function gatekeeper_content_verify_access( &$pContent, &$pHash ) {
 						ORDER BY branch
 						";
 		$gBitDb->setFatalActive( FALSE );
-				$tree = $pContent->mDb->getAssoc( $query, array( $pHash['content_id'] ) );
+				$tree = $pContent->mDb->getAssoc( $query, [ $pHash['content_id'] ] );
 		$gBitDb->setFatalActive( TRUE );
 				if( $tree ) {
 					// we will assume true here since the prevention cases can repeatedly flag FALSE
@@ -246,7 +246,7 @@ function gatekeeper_content_verify_access( &$pContent, &$pHash ) {
 				}
 				elseif (!empty( $gBitDb->mDb->_errorMsg )) {
 					if ($gBitUser->isOwner()) {
-						$gBitSmarty->assign( 'feedback', array( 'warning' => $gBitDb->mDb->_errorMsg . '<br/>' . KernelTools::tra( 'Please check the galleries to which this ' . $gLibertySystem->getContentTypeName( $pHash['content_type_guid'] ) . ' belongs' ) ) );
+						$gBitSmarty->assign( 'feedback', [ 'warning' => $gBitDb->mDb->_errorMsg . '<br/>' . KernelTools::tra( 'Please check the galleries to which this ' . $gLibertySystem->getContentTypeName( $pHash['content_type_guid'] ) . ' belongs' ) ] );
 					}
 				}
 			}
@@ -287,7 +287,6 @@ function gatekeeper_content_verify_access( &$pContent, &$pHash ) {
 	return $error;
 }
 
-
 function gatekeeper_authenticate( &$pInfo, $pFatalOnError = TRUE ) {
 	global $gBitSystem, $gBitSmarty;
 	$ret = FALSE;
@@ -298,16 +297,15 @@ function gatekeeper_authenticate( &$pInfo, $pFatalOnError = TRUE ) {
 			$_SESSION['gatekeeper_security'][$pInfo['security_id']] = md5( $pInfo['access_answer'] );
 		} else {
 			if( $pFatalOnError ) {
-				$gBitSystem->display("bitpackage:gatekeeper/authenticate.tpl", "Password Required" , array( 'display_mode' => 'display' ));
+				$gBitSystem->display("bitpackage:gatekeeper/authenticate.tpl", "Password Required" , [ 'display_mode' => 'display' ]);
 				die;
-			} else {
-				$ret = '<h2>'.KernelTools::tra( "Password Required" ).'</h2>'.$gBitSmarty->fetch( "bitpackage:gatekeeper/authenticate.tpl" );
 			}
+				$ret = '<h2>'.KernelTools::tra( "Password Required" ).'</h2>'.$gBitSmarty->fetch( "bitpackage:gatekeeper/authenticate.tpl" );
+
 		}
 	}
 	return $ret;
 }
-
 
 function gatekeeper_content_list( $pObject, $pParamHash ) {
 /*
@@ -323,7 +321,6 @@ function gatekeeper_content_list( $pObject, $pParamHash ) {
 */
 	global $gBitSystem, $gGatekeeper, $gBitUser;
 
-
 	$ret = [];
 
 	if( !is_a( $pObject, 'LibertyComment' ) ) {
@@ -336,7 +333,7 @@ function gatekeeper_content_list( $pObject, $pParamHash ) {
 					'select_sql' => ' ,gks.`security_id`, gks.`security_description`, gks.`is_private`, gks.`is_hidden`, gks.`access_question`, gks.`access_answer` ',
 					'join_sql'   => " LEFT OUTER JOIN `" . BIT_DB_PREFIX . "gatekeeper_security_map` cg ON (lc.`content_id`=cg.`content_id`) LEFT OUTER JOIN `" . BIT_DB_PREFIX . "gatekeeper_security` gks ON (gks.`security_id`=cg.`security_id` )  LEFT OUTER JOIN `" . BIT_DB_PREFIX . "fisheye_gallery_image_map` fgim ON (fgim.`item_content_id`=lc.`content_id`) LEFT OUTER JOIN `" . BIT_DB_PREFIX . "gatekeeper_security_map` tcs2 ON (fgim.`gallery_content_id`=tcs2.`content_id`) LEFT OUTER JOIN `" . BIT_DB_PREFIX . "gatekeeper_security` ts2 ON (ts2.`security_id`=tcs2.`security_id` )",
 					'where_sql'  => ' AND (tcs2.`security_id` IS NULL OR lc.`user_id`=?) ',
-					'bind_vars'  => array( $gBitUser->mUserId ),
+					'bind_vars'  => [ $gBitUser->mUserId ],
 				];
 			}
 		} else {
@@ -353,8 +350,6 @@ function gatekeeper_content_list( $pObject, $pParamHash ) {
 
 	return $ret;
 }
-
-
 
 function gatekeeper_content_edit( &$pContent ) {
 	global $gGatekeeper, $gBitUser, $gBitSmarty;
