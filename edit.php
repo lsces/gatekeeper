@@ -23,6 +23,7 @@
 /**
  * required setup
  */
+use Bitweaver\KernelTools;
 require_once '../kernel/includes/setup_inc.php';
 
 $gBitSystem->verifyPackage( 'gatekeeper' );
@@ -58,7 +59,7 @@ elseif( !empty( $sec ) ||
 			$formHash['security_id'] = $_REQUEST['security_id'];
 			$gBitSystem->confirmDialog( $formHash,
 				[
-					'warning' => tra('Are you sure you want to delete this security list?') . ' ' . $sec['security_description'],
+					'warning' => KernelTools::tra('Are you sure you want to delete this security list?') . ' ' . $sec['security_description'],
 				],
 			);
 		} elseif( $gGatekeeper->expungeSecurity( $sec['security_id'] ) ) {
